@@ -1,0 +1,185 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><meta name="theme-color" content="#193c2c"><title>里山ハンター｜スマホ操作修正版</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17372b;font-family:system-ui,-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;touch-action:none}canvas{width:100%;height:100%;display:block}.hud{position:fixed;z-index:3;top:env(safe-area-inset-top,0px);left:0;right:0;pointer-events:none;display:flex;justify-content:space-between;gap:8px;padding:12px}.cluster{display:flex;gap:7px;flex-wrap:wrap}.pill{color:white;font-weight:800;font-size:13px;background:#102d23d9;border:1px solid #c7dbb553;padding:8px 11px;border-radius:15px;box-shadow:0 3px 9px #13271955;white-space:nowrap}.tip{position:fixed;top:67px;left:50%;transform:translateX(-50%);background:#0b251de8;color:#f9fae9;padding:9px 15px;border-radius:16px;font-size:13px;font-weight:750;z-index:4;max-width:92%;text-align:center;pointer-events:none}.bottom{position:fixed;z-index:4;bottom:calc(14px + env(safe-area-inset-bottom,0px));right:12px;display:flex;flex-direction:column;gap:8px;max-width:220px}.btn{border:2px solid #f9efc9;background:#f4d77a;color:#342815;font-size:14px;font-weight:900;border-radius:15px;padding:12px 15px;box-shadow:0 4px 0 #a58537;cursor:pointer}.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a58537}.btn.secondary{background:#d2edce;border-color:#e9f5d9;box-shadow:0 4px 0 #8ca98c}.btn:disabled{background:#bbc4b0;color:#657260;border-color:#e1e5d3;box-shadow:0 4px 0 #879180}.joy{position:fixed;z-index:3;width:126px;height:126px;left:20px;bottom:calc(25px + env(safe-area-inset-bottom,0px));border:2px solid #e3f5d67a;border-radius:50%;background:#21452b6b;touch-action:none;user-select:none;display:grid;place-items:center}.knob{width:58px;height:58px;border-radius:50%;background:#ddedc5cd;border:3px solid #fff9;box-shadow:0 4px 12px #0004;transform:translate(0,0)}.panel{position:fixed;z-index:6;inset:0;background:#061a15a7;display:flex;justify-content:center;align-items:center;padding:20px}.panel[hidden]{display:none}.modal{width:min(470px,100%);background:#fff7e6;color:#2e3826;border:5px solid #4f7850;border-radius:23px;padding:22px;box-shadow:0 12px 40px #0006;text-align:center}.modal h1{margin:0 0 10px;font-size:27px}.modal p{font-size:14px;line-height:1.7}.modal .btn{width:100%;margin-top:10px}.small{font-size:12px;color:#576750}.hint{text-align:center;padding:7px;font-weight:800;background:#e1e8c8;border-radius:11px}.logo{font-weight:1000;color:#fff0ae;text-shadow:0 3px #1a4435}.progress{position:fixed;z-index:3;left:50%;bottom:12px;transform:translateX(-50%);border-radius:12px;background:#14392ad9;padding:7px 12px;color:white;font-size:11px;pointer-events:none;max-width:180px;text-align:center}@media(max-width:550px){.hud{padding:8px}.pill{font-size:11px;padding:7px 8px}.tip{top:94px;font-size:11px}.bottom{bottom:calc(20px + env(safe-area-inset-bottom,0px));max-width:164px}.btn{font-size:12px;padding:10px}.joy{width:112px;height:112px;left:14px;bottom:calc(24px + env(safe-area-inset-bottom,0px))}.progress{display:none}}
+body{display:flex;justify-content:center;align-items:center;background:#152b22!important}
+#screen{position:relative;width:min(100vw,calc(100dvh * .52));height:100dvh;overflow:hidden;background:#88bb59;box-shadow:0 0 45px #0006}
+@media(max-aspect-ratio: 7/12){#screen{width:100vw}}
+#game{width:100%;height:100%}
+.hud{position:absolute;top:12px;left:10px;right:10px;display:flex;align-items:flex-start;justify-content:space-between}
+.cluster:first-child .logo{background:#283c22a8;border-radius:50%;width:33px;height:33px;padding:5px 0;text-align:center;font-size:8px;line-height:20px;white-space:normal}
+.cluster:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.cluster:last-child .pill{font-size:12px;background:#202b1ec9;min-width:72px;border-radius:18px;padding:4px 12px;border-color:#d9d6ab4a;box-shadow:0 2px 5px #0003}
+.cluster:last-child #score,.cluster:last-child #level{display:none}
+.tip{position:absolute;top:58px;left:50%;width:max-content;max-width:80%;font-size:11px;background:#31522dbb;border-radius:9px}
+.joy{position:absolute;left:16px;bottom:57px;width:106px;height:106px;border:2px solid #ffffffe0;background:#ffffff2c;box-shadow:0 2px 4px #37553b3a}
+.knob{width:34px;height:34px;background:#ffffffe8;border:none;box-shadow:0 2px 5px #3347}
+.bottom{position:absolute;right:7px;bottom:14px;gap:5px;max-width:142px}
+.btn{padding:7px 7px;font-size:10px;line-height:1.2;background:#fff0b8eb;border-width:1px;border-radius:9px;box-shadow:0 2px 0 #8b783c}
+.btn.secondary{background:#e0f6d3ed;box-shadow:0 2px 0 #77aa72}
+.progress{position:absolute;left:50%;bottom:7px;max-width:154px;font-size:9px;opacity:.88;white-space:normal}
+.panel{position:absolute}
+
+/* v0.9.1 mobile start screen reliability fixes */
+#screen .panel{z-index:100;position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;align-items:safe center;padding:14px 12px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+#screen .modal{margin:auto;max-height:none;padding:clamp(12px,3vh,20px);border-width:3px;touch-action:pan-y}
+#screen .modal h1{font-size:clamp(20px,5vw,26px);margin:0 0 5px}
+#screen .modal p{font-size:12px;line-height:1.45;margin:7px 0}
+#screen .modal .small{font-size:11px}
+#screen #start{position:relative;z-index:101;display:block;min-height:52px;padding:13px;font-size:16px;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media(max-height:640px){#screen .modal{padding:9px 12px}#screen .modal p{margin:4px 0;line-height:1.3}#screen .modal h1{font-size:19px}#screen .hint{font-size:11px;padding:5px}#screen #start{margin-top:5px;min-height:48px}}
+</style></head><body><main id="screen"><canvas id="game"></canvas><div class="hud"><div class="cluster"><div class="pill logo">里山狩猟</div></div><div class="cluster"><div class="pill" id="meat">🥩 0/84</div><div class="pill" id="stock">📦 0</div><div class="pill" id="money">🪙 0</div><div class="pill" id="combo" style="background:#9e5728d9;display:none">🔥 2連続</div><div class="pill" id="level">🪓 1</div><div class="pill" id="score">❤️ 3/3</div></div></div><div class="tip" id="tip">猪をなぎ倒して肉を大量ゲット！ 連続ヒットでFEVER！</div><div class="joy" id="joy"><div class="knob" id="knob"></div></div><div class="bottom"><button class="btn secondary" id="sell">📦 肉を納品</button><button class="btn" id="upgrade">🏹 武器強化 ¥40</button><button class="btn secondary" id="bag">🎒 バッグ強化 ¥35</button></div><div class="progress" id="progress">📍 拠点に戻ると肉を売れるよ</div><div class="panel" id="panel"><div class="modal"><h1>🌲 里山ハンター</h1><p>日本の里山を歩き回り、猪の群れをテンポよく狩ってジビエを販売！<br>稼いだお金で装備を強くして、さらに狩りを楽しもう。</p><div class="hint">🕹 移動だけでOK・斧を振って自動攻撃・猪は突進してくる</div><p class="small">スマホ：左下のスティックで移動<br>PC：WASD または矢印キー<br>🏡 売店のそばを通ると自動納品 → お客さんが順番に購入</p><button class="btn" id="start">狩猟をはじめる！</button><p class="small">試作品 ver.0.9.1｜広告・課金なし｜獲物や表現はデフォルメ</p></div></div><script>
+(()=>{'use strict';const c=document.getElementById('game'),g=c.getContext('2d');let W=0,H=0,dpr=1;function resize(){W=document.getElementById('screen').clientWidth;H=document.getElementById('screen').clientHeight;dpr=Math.min(devicePixelRatio||1,2);c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);g.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();const $=id=>document.getElementById(id),world={w:1500,h:1700},base={x:520,y:555};let running=false,money=0,meat=0,stock=0,bag=84,lvl=1,kills=0,attackAt=0,tipUntil=0,tipText='',now=0,last=0,flash=[],boars=[],trees=[],flowers=[],dust=[];let customers=[],nextCustomer=0,saleAt=0,customerId=0;const decor=[];let hp=3, invuln=0,combo=0,comboTime=0,shake=0,depositTimer=0,gameTime=0,particles=[],rings=[],fever=0,hitPulse=0;const p={x:550,y:780,face:1,walk:0,attackAnim:0,attackDir:0};const rng=(a,b)=>a+Math.random()*(b-a),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));let keys={},stick={x:0,y:0},startStamp=0;function makeWorld(){for(let i=0;i<205;i++){let x=rng(55,world.w-60),y=rng(55,world.h-60);if(Math.abs(x-base.x)<225&&Math.abs(y-base.y)<210)continue;trees.push({x,y,r:rng(24,39),type:Math.random()<.7?0:1});}for(let i=0;i<230;i++)flowers.push({x:rng(0,world.w),y:rng(0,world.h),tone:Math.random()});for(let i=0;i<420;i++){let x=rng(20,world.w-20),y=rng(20,world.h-20);decor.push({x,y,t:Math.random(),sz:rng(2,7)});}for(let i=0;i<44;i++)spawnBoar();}function insidePen(x,y,pad=0){return x>base.x-188-pad&&x<base.x+177+pad&&y>base.y-170-pad&&y<base.y+140+pad;}function fenceOut(b,ox,oy){if(!insidePen(b.x,b.y,17))return;let L=Math.abs(b.x-(base.x-205)),R=Math.abs(b.x-(base.x+194)),T=Math.abs(b.y-(base.y-187)),B=Math.abs(b.y-(base.y+157));let m=Math.min(L,R,T,B);if(m===L)b.x=base.x-206;else if(m===R)b.x=base.x+195;else if(m===T)b.y=base.y-188;else b.y=base.y+158;b.dir=Math.atan2(b.y-oy,b.x-ox);b.mode="roam";b.cooldown=1.5;}function spawnBoar(){let x,y;do{x=clamp(p.x+rng(-470,470),85,world.w-75);y=clamp(p.y+rng(-540,540),85,world.h-75)}while(insidePen(x,y,85)||Math.hypot(x-base.x,y-base.y)<300||Math.hypot(x-p.x,y-p.y)<105);boars.push({x,y,hp:3+Math.floor(kills/80),maxhp:3+Math.floor(kills/80),dir:rng(0,6.28),turn:rng(.6,2),speed:rng(34,55),hit:0,mode:'roam',windup:0,chargeTime:0,cooldown:rng(.5,1.5),vx:0,vy:0,id:Math.random()})}makeWorld();function message(s,t=2.5){tipText=s;tipUntil=now+t;$('tip').textContent=s}function rounded(x,y,w,h,r,fill){g.fillStyle=fill;g.beginPath();g.roundRect(x,y,w,h,r);g.fill()}function circle(x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill()}function canopy(x,y,r,light,dark){const sh=g.createRadialGradient(x-r*.3,y-r*.5,r*.1,x,y,r);sh.addColorStop(0,light);sh.addColorStop(.72,light);sh.addColorStop(1,dark);circle(x,y,r,sh)}
+function drawTree(t){
+ const x=t.x,y=t.y,r=t.r;
+ g.save();g.fillStyle='#12352a55';g.beginPath();g.ellipse(x+9,y+14,r*.95,r*.40,-.1,0,7);g.fill();
+ rounded(x-6,y-17,13,37,3,'#65452b');rounded(x-3,y-16,3,34,1,'#b18a56');
+ if(t.type===0){
+  canopy(x+3,y-23,r+5,'#69b75c','#2b7446');canopy(x-13,y-30,r*.75,'#8ed36e','#398c4c');canopy(x+16,y-37,r*.70,'#7fc869','#327947');canopy(x-2,y-46,r*.67,'#a0db76','#4a9854');
+  for(let i=0;i<5;i++){let a=i*2.35;circle(x+Math.cos(a)*r*.47,y-31+Math.sin(a)*r*.37,2.6,'#cbe6a06e')}
+ }else{
+  for(let j=0;j<3;j++){let yy=y-18-j*20, ww=r*(1.08-j*.18);g.beginPath();g.moveTo(x,yy-43);g.lineTo(x-ww,yy+9);g.quadraticCurveTo(x,yy+1,x+ww,yy+9);g.closePath();let lg=g.createLinearGradient(x-ww,yy,x+ww,yy);lg.addColorStop(0,'#245d4a');lg.addColorStop(.48,'#509e72');lg.addColorStop(1,'#267052');g.fillStyle=lg;g.fill();g.strokeStyle='#b8dc9b77';g.lineWidth=1;g.beginPath();g.moveTo(x,yy-35);g.lineTo(x,yy+4);g.stroke()}
+ }
+ g.restore();}
+function boarDraw(b){if(b.mode==='windup'){g.save();g.strokeStyle='#da5139';g.lineWidth=3;g.setLineDash([7,7]);g.beginPath();g.arc(b.x,b.y,30,0,Math.PI*2);g.stroke();g.setLineDash([]);g.restore();}g.save();g.translate(b.x,b.y);g.scale(b.dir>Math.PI/2&&b.dir<Math.PI*1.5?-1:1,1);g.fillStyle='#1b342a66';g.beginPath();g.ellipse(4,17,24,9,0,0,7);g.fill();g.fillStyle=b.hit>0?'#e8ab91':b.mode==='charge'?'#a76549':'#88533f';g.beginPath();g.ellipse(0,0,22,16,0,0,7);g.fill();g.strokeStyle='#593625';g.lineWidth=1.8;g.stroke();g.strokeStyle='#d3a17e75';g.lineWidth=2;g.beginPath();g.arc(-4,-4,16,3.3,5.6);g.stroke();circle(13,-7,12,b.hit>0?'#ffc4a9':'#a46a4c');circle(23,-1,8,'#c3886b');circle(26,-4,1.6,'#49352a');circle(22,-4,1.6,'#49352a');circle(17,-11,2.3,'#241e18');circle(17.7,-11.7,.8,'#ffffff');g.fillStyle='#f6e8cb';g.beginPath();g.moveTo(16,4);g.lineTo(20,9);g.lineTo(23,2);g.fill();g.fillStyle='#6c4837';g.beginPath();g.moveTo(3,-19);g.lineTo(10,-26);g.lineTo(14,-15);g.fill();rounded(-12,10,5,12,2,'#633c2b');rounded(9,10,5,12,2,'#633c2b');g.restore();if(b.hp<b.maxhp){rounded(b.x-20,b.y-38,40,5,2,'#522a2a');rounded(b.x-20,b.y-38,40*(b.hp/b.maxhp),5,2,'#f5d77b')}}function hunter(){if(meat>0){const count=Math.min(24,Math.ceil(meat/2));for(let i=0;i<count;i++){const cx=p.x+11+(i%3)*10,cy=p.y-23-Math.floor(i/3)*12;rounded(cx-5,cy-4,13,10,3,'#b94e43');rounded(cx-3,cy-4,9,3,2,'#ed9181');}}circle(p.x+2,p.y+15,18,'#1d3b2e66');g.save();g.translate(p.x,p.y);const bob=Math.sin(p.walk)*1.8;rounded(-10,3+bob,8,18,3,'#4a4435');rounded(3,3-bob,8,18,3,'#4a4435');rounded(-15,-12,30,29,7,'#536c4b');rounded(-10,-12,14,25,5,'#7f9d67');rounded(-18,-10,7,20,3,'#c59b74');rounded(11,-10,7,20,3,'#c59b74');circle(0,-19+bob,12,'#bb8e6b');circle(-3,-22+bob,8,'#e0b78c');rounded(-13,-33+bob,27,9,3,'#424b38');rounded(-17,-27+bob,34,5,2,'#565c42');rounded(-5,-17+bob,3,3,1,'#292c24');rounded(5,-17+bob,3,3,1,'#292c24');g.restore();
+// 武器の振り下ろし: 狙った動物の方向へ斧を大きく振る
+const swinging=p.attackAnim>0;
+const phase=swinging?1-p.attackAnim/.24:0;
+const ease=phase<.5?2*phase*phase:1-Math.pow(-2*phase+2,2)/2;
+const aim=swinging?p.attackDir:(p.face>0?0:Math.PI);
+const angle=aim-1.35+ease*2.25;
+g.save();g.translate(p.x,p.y-7);g.rotate(angle);
+// 手と柄が回転するので、自動攻撃でも攻撃方向が分かる
+rounded(3,-4,17,8,4,'#c59b74');
+rounded(12,-4,39,7,3,'#825b39');
+rounded(42,-15,13,27,3,'#bdcad0');
+rounded(39,-13,5,23,2,'#eef3ed');
+rounded(48,-12,7,5,2,'#8c9b9d');
+g.restore();
+if(swinging&&phase>.18&&phase<.82){g.save();g.strokeStyle='rgba(249,234,164,'+(0.82*Math.sin(Math.PI*(phase-.18)/.64))+')';g.lineWidth=11;g.lineCap='round';g.beginPath();g.arc(p.x,p.y-7,57,aim-1.0,aim+0.85);g.stroke();g.restore();}
+}function drawBase(){
+ const x=base.x,y=base.y;
+ // light sandy fenced workshop, viewed from above
+ rounded(x-192,y-174,376,320,8,'#6b8a4b');rounded(x-188,y-170,365,310,6,'#d7bf8d');for(let i=0;i<48;i++){const px=x-170+(i*83)%335,py=y-153+(i*47)%265;circle(px,py,2.5,i%3?'#bea67588':'#f4dda966');}
+ g.strokeStyle='#bfa273';g.lineWidth=3;g.strokeRect(x-185,y-167,358,303);
+ function fence(ax,ay,bx,by){g.strokeStyle='#65482c';g.lineWidth=6;g.beginPath();g.moveTo(ax,ay);g.lineTo(bx,by);g.stroke();let count=Math.ceil(Math.hypot(ax-bx,ay-by)/24);for(let i=0;i<=count;i++){let t=i/count,px=ax+(bx-ax)*t,py=ay+(by-ay)*t;rounded(px-5,py-16,10,23,2,'#9c6034');rounded(px-5,py-16,10,5,1,'#d29961');}}
+ fence(x-185,y-165,x+172,y-165);fence(x-185,y-165,x-185,y+140);fence(x-185,y+140,x-55,y+140);fence(x+68,y+140,x+172,y+140);fence(x+172,y-165,x+172,y+140);
+ // smoking oven and meat processing stalls
+ for(let i=0;i<2;i++){let q=x+34+i*70;rounded(q-23,y-128,52,68,7,'#4a6170');rounded(q-23,y-143,54,24,4,'#425c68');rounded(q-18,y-139,44,14,3,'#9bb0b8');g.strokeStyle='#e6f4ed99';g.lineWidth=2;g.beginPath();g.moveTo(q-11,y-135);g.lineTo(q+17,y-135);g.stroke();rounded(q-21,y-70,48,14,4,'#aeb9bb');circle(q+10,y-135,5,'#ebcb67');}
+ rounded(x-165,y-82,80,52,5,'#845739');rounded(x-168,y-115,86,29,5,'#a85f38');rounded(x-163,y-111,76,20,3,'#d18a51');g.strokeStyle='#f6c48b';g.lineWidth=3;g.beginPath();g.moveTo(x-156,y-105);g.lineTo(x-94,y-105);g.stroke();for(let i=0;i<4;i++)rounded(x-150+i*15,y-60,13,24,4,'#b8473e');
+ // market station, bright crates
+ rounded(x-145,y+30,90,52,7,'#76573e');rounded(x-149,y+13,98,25,4,'#a44b38');rounded(x-144,y+18,88,14,4,'#e1a66e');for(let i=0;i<3;i++)circle(x-130+i*25,y+20,9,'#dd774f');
+ // campfire and upgrade plate
+ circle(x-10,y-50,32,'#77878a');circle(x-10,y-50,24,'#a1a5a1');circle(x-10,y-50,17,'#625448');circle(x-10,y-60,14,'#f9ab2a');circle(x-10,y-70,8,'#fbea73');
+ rounded(x-38,y+62,75,44,7,'#8bb9ad');rounded(x-31,y+69,61,30,4,'#e2db8a');g.fillStyle='#395b34';g.font='bold 13px system-ui';g.textAlign='center';g.fillText('強化',x,y+90);
+ g.fillStyle='#fff9d5';g.font='bold 15px system-ui';g.fillText('ジビエ直売所',x-102,y-102);
+}
+function drawCustomers(){
+  // The first customer stands at the stall; new customers join behind them.
+  for(let i=0;i<customers.length;i++){
+    const a=customers[i],tx=base.x-120+i*25,ty=base.y+149+i*8;
+    a.x+=(tx-a.x)*Math.min(1,.1);a.y+=(ty-a.y)*Math.min(1,.1);
+    circle(a.x+2,a.y+11,10,'#28402c55');
+    rounded(a.x-8,a.y-2,16,21,5,a.color);
+    circle(a.x,a.y-11,8,'#e9bc91');
+    g.fillStyle='#534839';g.beginPath();g.arc(a.x,a.y-14,8,Math.PI,Math.PI*2);g.fill();
+    if(i===0){g.font='17px system-ui';g.textAlign='center';g.fillStyle='#fff';g.fillText(stock>0?'🥩':'💬',a.x,a.y-30)}
+  }
+  g.font='bold 14px system-ui';g.textAlign='center';g.fillStyle='#234a31';
+  g.fillText('お客 '+customers.length+'人',base.x+77,base.y+190);
+}
+function updateCustomers(dt){
+  nextCustomer-=dt;
+  if(nextCustomer<=0){nextCustomer=rng(.8,1.8);if(customers.length<9){customers.push({id:customerId++,x:base.x+170,y:base.y+220,color:['#b76454','#54769b','#c69e44','#728a65','#986fa0'][customerId%5]})}}
+  saleAt-=dt;
+  if(saleAt<=0 && stock>0 && customers.length){
+    saleAt=.42;stock--;money+=12;
+    let buyer=customers.shift();flash.push({x:base.x+115,y:base.y+75,text:'+¥12',color:'#fff6a0',life:.8});
+    // A customer buys one package then leaves; the queue advances.
+  }
+}
+function drawGround(){
+ g.fillStyle='#87b85b';g.fillRect(0,0,world.w,world.h);
+ for(const d of decor){const x=d.x,y=d.y;if(insidePen(x,y,8))continue;
+ if(d.t<.24){g.fillStyle='#e6cd8d88';g.beginPath();g.ellipse(x,y,d.sz*1.5,d.sz*.8,0,0,7);g.fill()}
+ else if(d.t<.75){g.strokeStyle=d.t<.45?'#d1df86aa':'#4f924b66';g.lineWidth=1.7;g.lineCap='round';g.beginPath();g.moveTo(x,y+3);g.lineTo(x-3,y-d.sz);g.moveTo(x,y+3);g.lineTo(x+3,y-d.sz*.8);g.stroke()}
+ else {circle(x,y,2.5,d.t>.9?'#f1e4bc':'#e3c5a5');circle(x+2,y-2,1,'#fff6d8')}
+ }
+}
+function drawRoad(){g.save();g.lineCap='round';g.lineJoin='round';const path=()=>{g.beginPath();g.moveTo(-70,255);g.bezierCurveTo(250,300,355,500,620,455);g.bezierCurveTo(870,380,1050,290,1580,440)};
+ path();g.strokeStyle='#739b59';g.lineWidth=100;g.stroke();path();g.strokeStyle='#b6b285';g.lineWidth=87;g.stroke();path();g.strokeStyle='#d2c397';g.lineWidth=72;g.stroke();path();g.strokeStyle='#dbcaa0';g.lineWidth=54;g.stroke();g.restore()}
+function draw(){const scale=Math.min(W/480,H/770)*1.13;const vw=W/scale,vh=H/scale;const camx=clamp(p.x-vw/2,0,Math.max(0,world.w-vw)),camy=clamp(p.y-vh/2,0,Math.max(0,world.h-vh));const jitterX=shake>0?(Math.random()-.5)*shake:0,jitterY=shake>0?(Math.random()-.5)*shake:0;g.fillStyle='#85b95a';g.fillRect(0,0,W,H);g.save();g.scale(scale,scale);g.translate(-camx+jitterX,-camy+jitterY);drawGround();drawRoad();for(const f of flowers){circle(f.x,f.y,2.4,f.tone>.65?'#d4c36f':f.tone>.32?'#61935d':'#d9caa0')}g.strokeStyle='#567d59';g.lineWidth=2;g.strokeRect(12,12,world.w-24,world.h-24);drawBase();drawCustomers();const actors=[...trees.map(t=>({y:t.y,draw:()=>drawTree(t)})),...boars.map(b=>({y:b.y,draw:()=>boarDraw(b)})),{y:p.y,draw:()=>hunter()}];actors.sort((a,b)=>a.y-b.y);for(const actor of actors)actor.draw();for(const r of rings){g.globalAlpha=Math.min(1,r.life/.32);g.lineWidth=3+r.life*11;g.strokeStyle=r.color;g.beginPath();g.arc(r.x,r.y,12+(1-r.life/.32)*53,0,Math.PI*2);g.stroke();}g.globalAlpha=1;
+for(const q of particles){g.globalAlpha=Math.max(0,Math.min(1,q.life/q.max));g.save();g.translate(q.x,q.y);g.rotate(q.rot);if(q.type==='meat'){rounded(-8,-6,16,12,4,'#bf4e49');rounded(-6,-5,11,5,3,'#f7a38c');circle(-4,-2,2,'#fff1e2');}else{circle(0,0,q.r,q.color);}g.restore();}g.globalAlpha=1;
+for(const f of flash){g.globalAlpha=f.life/.8;g.fillStyle=f.color;g.font='bold 22px system-ui';g.textAlign='center';g.fillText(f.text,f.x,f.y-32-(.8-f.life)*45);g.globalAlpha=1}g.restore();let near=dist(p,base)<220;$('score').textContent='❤️ '+hp+'/3　🐗 '+kills+'頭';$('combo').style.display=combo>1?'block':'none';$('combo').textContent=fever>0?'🔥 FEVER '+Math.ceil(fever)+'秒':'⚡ '+combo+' HIT';const banner=near?'🏠 売店に近づけば自動納品！ お客さんが買うよ':'📍 肉を集めたら直売所へ戻ろう';$('progress').textContent=banner;$('sell').disabled=!near||meat===0;$('upgrade').disabled=money<40*lvl;$('bag').disabled=money<35*(Math.floor((bag-84)/18)+1);$('money').textContent='💴 '+money;$('meat').textContent='🥩 '+meat+'/'+bag;$('stock').textContent='🏪 '+stock+'個';$('level').textContent='🪓 '+lvl;$('upgrade').textContent='🏹 武器強化 ¥'+40*lvl;$('bag').textContent='🎒 バッグ強化 ¥'+35*(Math.floor((bag-84)/18)+1)}function update(dt){now+=dt;gameTime+=dt;shake=Math.max(0,shake-dt*55);hitPulse=Math.max(0,hitPulse-dt*4);fever=Math.max(0,fever-dt);comboTime=Math.max(0,comboTime-dt);if(comboTime===0)combo=0;depositTimer=Math.max(0,depositTimer-dt);p.attackAnim=Math.max(0,p.attackAnim-dt);
+for(const q of particles){q.life-=dt;q.vy+=260*dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.rot+=dt*q.spin;}particles=particles.filter(q=>q.life>0).slice(-180);
+for(const r of rings)r.life-=dt;rings=rings.filter(r=>r.life>0);updateCustomers(dt);let dx=stick.x+(keys['arrowright']||keys.d?1:0)-(keys['arrowleft']||keys.a?1:0),dy=stick.y+(keys['arrowdown']||keys.s?1:0)-(keys['arrowup']||keys.w?1:0),len=Math.hypot(dx,dy);if(len>.08){dx/=Math.max(1,len);dy/=Math.max(1,len);p.x=clamp(p.x+dx*355*dt,32,world.w-32);p.y=clamp(p.y+dy*355*dt,40,world.h-35);p.walk+=dt*16;p.face=dx>=0?1:-1;}invuln=Math.max(0,invuln-dt);
+// Automatic delivery: running to the village stall should never interrupt the flow.
+if(meat>0 && dist(p,{x:base.x-105,y:base.y+105})<130 && depositTimer===0){
+  const delivered=meat;stock+=delivered;meat=0;depositTimer=1.2;
+  flash.push({x:base.x-98,y:base.y+95,text:'納品 +'+delivered+'🥩',color:'#fff3a1',life:1.0});
+  message('🏪 '+delivered+'個納品！ お客さんが買っていくよ',1.5);
+}
+for(const b of boars){
+ b.hit=Math.max(0,b.hit-dt);
+ b.cooldown=Math.max(0,b.cooldown-dt);
+ const d=dist(p,b);
+ if(b.mode==='windup'){
+   b.windup-=dt;
+   if(b.windup<=0){b.mode='charge';b.chargeTime=.43;b.vx=Math.cos(b.dir)*375;b.vy=Math.sin(b.dir)*375;}
+ }else if(b.mode==='charge'){
+   b.x=clamp(b.x+b.vx*dt,30,world.w-30);
+   b.y=clamp(b.y+b.vy*dt,30,world.h-30);
+   b.chargeTime-=dt;
+   if(dist(p,b)<31 && invuln===0){
+     hp=Math.max(0,hp-1); invuln=1.5;shake=11;
+     const knock=Math.atan2(p.y-b.y,p.x-b.x);
+     p.x=clamp(p.x+Math.cos(knock)*56,32,world.w-32);
+     p.y=clamp(p.y+Math.sin(knock)*56,40,world.h-35);
+     flash.push({x:p.x,y:p.y,text:'-❤️',color:'#ffebe1',life:.8});
+     message('🐗 猪の突進！ 横に動いて避けよう',2);
+     if(hp===0){hp=3;p.x=base.x+105;p.y=base.y+130;message('🏡 拠点に戻って回復したよ！',3);}
+   }
+   if(b.chargeTime<=0){b.mode='roam';b.cooldown=rng(2.2,3.5);b.turn=rng(.5,1.3);}
+ }else{
+   b.turn-=dt;
+   if(b.turn<0){b.turn=rng(.8,2.8);b.dir=rng(0,6.28);}
+   if(d<190 && d>34 && b.cooldown<=0){
+     b.mode='windup';b.windup=.7;b.dir=Math.atan2(p.y-b.y,p.x-b.x);
+   }else{
+     const pace=d<190 ? 1.45:1;
+     b.x=clamp(b.x+Math.cos(b.dir)*b.speed*pace*dt,30,world.w-30);
+     b.y=clamp(b.y+Math.sin(b.dir)*b.speed*pace*dt,30,world.h-30);
+   }
+ }
+ fenceOut(b,b.x-1,b.y-1);
+}
+if(now>attackAt){
+ const targets=boars.filter(b=>dist(b,p)<125).sort((a,b)=>dist(a,p)-dist(b,p)).slice(0,fever>0?5:3);
+ if(targets.length){
+  attackAt=now+(fever>0?.115:.19);p.attackAnim=.24;
+  const target=targets[0];p.attackDir=Math.atan2(target.y-p.y,target.x-p.x);p.face=target.x>=p.x?1:-1;
+  shake=3.5;hitPulse=.36;
+  rings.push({x:p.x,y:p.y,life:.32,color:'#ffe7a0'});
+  for(const b of targets){
+   b.hp-=lvl+2;b.hit=.17;
+   const ang=Math.atan2(b.y-p.y,b.x-p.x);
+   b.x=clamp(b.x+Math.cos(ang)*13,30,world.w-30);b.y=clamp(b.y+Math.sin(ang)*13,30,world.h-30);
+   fenceOut(b,b.x-1,b.y-1);
+   flash.push({x:b.x,y:b.y,text:'-'+(lvl+2),color:'#ffe692',life:.5});
+   for(let j=0;j<6;j++){const a=rng(0,6.28),v=rng(65,220);particles.push({x:b.x,y:b.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-90,rot:0,spin:rng(-4,4),r:rng(2,6),color:j%2?'#ffdb81':'#fff6d2',type:'spark',life:rng(.2,.5),max:.5});}
+   if(b.hp<=0){
+    boars.splice(boars.indexOf(b),1);kills++;combo=comboTime>0?combo+1:1;comboTime=4.5;shake=7;
+    if(combo>=8)fever=3.2;
+    const loot=6+Math.floor(Math.random()*7),stored=Math.min(loot,bag-meat);meat+=stored;
+    if(loot>stored)money+=(loot-stored)*6;
+    rings.push({x:b.x,y:b.y,life:.32,color:'#ffdc8b'});
+    flash.push({x:b.x,y:b.y-19,text:'🥩 +'+loot+(combo>=3?'  '+combo+' HIT!':''),color:'#fff4aa',life:1.05});
+    for(let j=0;j<Math.min(12,loot+3);j++){
+      const a=rng(0,Math.PI*2),v=rng(80,270);
+      particles.push({x:b.x,y:b.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-160,rot:rng(0,6),spin:rng(-9,9),type:'meat',life:rng(.65,1.1),max:1.1});
+    }
+    if(combo===8)message('🔥 FEVER！攻撃が超高速に！',2);
+    setTimeout(()=>{if(running)spawnBoar()},180);
+   }
+  }
+ }
+}
+for(const f of flash)f.life-=dt;flash=flash.filter(f=>f.life>0);if(now>tipUntil){$('tip').textContent=meat>=bag?'🎒 満杯！余った肉は自動換金中！':meat?'🏠 売店に肉を補充しよう':'🐗 近づくだけで複数の猪に連続攻撃！'}}function loop(t){if(!running)return;let dt=Math.min(.04,(t-last)/1000||.016);last=t;update(dt);draw();requestAnimationFrame(loop)}function beginGame(){if(running)return;$('panel').hidden=true;running=true;last=performance.now();requestAnimationFrame(loop)}$('start').addEventListener('click',beginGame);$('start').addEventListener('pointerup',beginGame);$('start').addEventListener('touchend',beginGame,{passive:true});$('sell').onclick=()=>{if(dist(p,base)>220||meat===0)return;const delivered=meat;stock+=meat;meat=0;message('📦 肉を'+delivered+'個補充！ お客さんの購入を待とう',3)};$('upgrade').onclick=()=>{let cost=40*lvl;if(money<cost)return;money-=cost;lvl++;message('🏹 武器がレベル'+lvl+'に！ 攻撃力アップ',3)};$('bag').onclick=()=>{let cost=35*(Math.floor((bag-84)/18)+1);if(money<cost)return;money-=cost;bag+=18;message('🎒 バッグ容量が'+bag+'に！',3)};addEventListener('keydown',e=>{const k=e.key.toLowerCase();keys[k]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);const joy=$('joy'),knob=$('knob');let pointer=null;function setJoy(e){const r=joy.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2),mag=Math.hypot(x,y)||1,k=Math.min(1,mag/(r.width*.34));stick.x=x/mag*k;stick.y=y/mag*k;knob.style.transform=`translate(${stick.x*31}px,${stick.y*31}px)`}joy.addEventListener('pointerdown',e=>{pointer=e.pointerId;joy.setPointerCapture(pointer);setJoy(e)});joy.addEventListener('pointermove',e=>{if(pointer===e.pointerId)setJoy(e)});function stop(e){if(pointer===e.pointerId){pointer=null;stick.x=0;stick.y=0;knob.style.transform='translate(0,0)'}}joy.addEventListener('pointerup',stop);joy.addEventListener('pointercancel',stop);draw();})();
+</script></main></body></html>
